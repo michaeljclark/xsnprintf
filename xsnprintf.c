@@ -62,7 +62,7 @@ int xvsnprintf(char * restrict out, size_t n, const char* fmt, va_list vl)
     int w = -1, s = 0, c;
     size_t o = 0, l;
     const char *v;
-    char t[20];
+    char t[21];
     for( ; *fmt; fmt++) {
         if (w >= 0) {
             switch(*fmt) {
@@ -78,7 +78,7 @@ int xvsnprintf(char * restrict out, size_t n, const char* fmt, va_list vl)
                         val = -val;
                         o = xvappend_char(out, o, n, '-');
                     }
-                    l = utoa_u32(val, t + 10);
+                    l = utoa_u32(val, t);
                 }
                 else if (w == 2 || sizeof(long) == 8) {
                     llong val = va_arg(vl, llong);
@@ -86,10 +86,10 @@ int xvsnprintf(char * restrict out, size_t n, const char* fmt, va_list vl)
                         val = -val;
                         o = xvappend_char(out, o, n, '-');
                     }
-                    l = utoa_u64(val, t + 0);
+                    l = utoa_u64(val, t);
                 }
                 l = n - o < l ? n - o : l;
-                memcpy(out + o, t + sizeof(t) - l, l);
+                memcpy(out + o, t, l);
                 o += l;
                 w = -1;
                 s = 0;

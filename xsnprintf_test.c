@@ -48,14 +48,14 @@ static void test_utoa_u32()
         "4",
         "0"
     };
-    char s[10];
+    char s[11];
     uint n = 4294967295u;
     for (int i = 0; i < 11; i++) {
-        size_t l = utoa_u32(n, s);
+        utoa_u32(n, s);
         #if DEBUG
-            printf("%.*s\n", (int)l, s + sizeof(s) - l);
+            printf("%s\n", s);
         #endif
-        assert(memcmp(r[i], s + sizeof(s) - l, l) == 0);
+        assert(strcmp(r[i], s) == 0);
         n /= 10;
     }
 }
@@ -85,14 +85,14 @@ static void test_utoa_u64()
         "1",
         "0"
     };
-    char s[20];
+    char s[21];
     ullong n = 18446744073709551615ull;
     for (int i = 0; i < 21; i++) {
-        size_t l = utoa_u64(n, s);
+        utoa_u64(n, s);
         #if DEBUG
-            printf("%.*s\n", (int)l, s + sizeof(s) - l);
+            printf("%s\n", s);
         #endif
-        assert(memcmp(r[i], s + sizeof(s) - l, l) == 0);
+        assert(strcmp(r[i], s) == 0);
         n /= 10;
     }
 }
@@ -124,29 +124,28 @@ static void rnd_teardown(void *ctx)
 
 static size_t test_utoa_rnd_u32(void *ctx, size_t count)
 {
-    char buf1[10], buf2[11];
-    size_t l1, l2, pass = 0, total = 0;
+    char buf1[11], buf2[11];
+    size_t total = 0;
     for (size_t i = 0; i < count; i++) {
         memset(buf1, 0, sizeof(buf1));
         memset(buf2, 0, sizeof(buf2));
-        l1 = utoa_u32(((uint*)ctx)[i], buf1);
-        l2 = snprintf(buf2, sizeof(buf2), "%u", ((uint*)ctx)[i]);
-        pass = (l1 == l2) && memcmp(buf1 + sizeof(buf1) - l1, buf2, l1) == 0;
-        total += pass;
+        utoa_u32(((uint*)ctx)[i], buf1);
+        snprintf(buf2, sizeof(buf2), "%u", ((uint*)ctx)[i]);
+        total += strcmp(buf1, buf2) == 0;
     }
     return total;
 }
 
 static size_t test_utoa_rnd_u64(void *ctx, size_t count)
 {
-    char buf1[20], buf2[21];
-    size_t l1, l2, total = 0;
+    char buf1[21], buf2[21];
+    size_t total = 0;
     for (size_t i = 0; i < count; i++) {
         memset(buf1, 0, sizeof(buf1));
         memset(buf2, 0, sizeof(buf2));
-        l1 = utoa_u64(((ullong*)ctx)[i], buf1);
-        l2 = snprintf(buf2, sizeof(buf2), "%llu", ((ullong*)ctx)[i]);
-        total += (l1 == l2) && memcmp(buf1 + sizeof(buf1) - l1, buf2, l1) == 0;
+        utoa_u64(((ullong*)ctx)[i], buf1);
+        snprintf(buf2, sizeof(buf2), "%llu", ((ullong*)ctx)[i]);
+        total += strcmp(buf1, buf2) == 0;
     }
     return total;
 }
@@ -154,13 +153,13 @@ static size_t test_utoa_rnd_u64(void *ctx, size_t count)
 static size_t test_xsnprintf_rnd_u32(void *ctx, size_t count)
 {
     char buf1[11], buf2[11];
-    size_t l1, l2, total = 0;
+    size_t total = 0;
     for (size_t i = 0; i < count; i++) {
         memset(buf1, 0, sizeof(buf1));
         memset(buf2, 0, sizeof(buf2));
-        l1 = xsnprintf(buf1, sizeof(buf1), "%u", ((uint*)ctx)[i]);
-        l2 = snprintf(buf2, sizeof(buf2), "%u", ((uint*)ctx)[i]);
-        total += (l1 == l2) && memcmp(buf1, buf2, 10) == 0;
+        xsnprintf(buf1, sizeof(buf1), "%u", ((uint*)ctx)[i]);
+        snprintf(buf2, sizeof(buf2), "%u", ((uint*)ctx)[i]);
+        total += strcmp(buf1, buf2) == 0;
     }
     return total;
 }
@@ -168,13 +167,13 @@ static size_t test_xsnprintf_rnd_u32(void *ctx, size_t count)
 static size_t test_xsnprintf_rnd_u64(void *ctx, size_t count)
 {
     char buf1[21], buf2[21];
-    size_t l1, l2, total = 0;
+    size_t total = 0;
     for (size_t i = 0; i < count; i++) {
         memset(buf1, 0, sizeof(buf1));
         memset(buf2, 0, sizeof(buf2));
-        l1 = xsnprintf(buf1, sizeof(buf1), "%llu", ((ullong*)ctx)[i]);
-        l2 = snprintf(buf2, sizeof(buf2), "%llu", ((ullong*)ctx)[i]);
-        total += (l1 == l2) && memcmp(buf1, buf2, 20) == 0;
+        xsnprintf(buf1, sizeof(buf1), "%llu", ((ullong*)ctx)[i]);
+        snprintf(buf2, sizeof(buf2), "%llu", ((ullong*)ctx)[i]);
+        total += strcmp(buf1, buf2) == 0;
     }
     return total;
 }

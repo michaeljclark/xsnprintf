@@ -59,7 +59,7 @@ static void rnd_teardown(void *ctx)
 
 static size_t bench_utoa_sml_u32(void *ctx, size_t count)
 {
-    char buf[10];
+    char buf[11];
     size_t total = 0;
     for (size_t i = 0; i < count; i++) {
         total += utoa_u32((uint)i, buf);
@@ -69,7 +69,7 @@ static size_t bench_utoa_sml_u32(void *ctx, size_t count)
 
 static size_t bench_utoa_sml_u64(void *ctx, size_t count)
 {
-    char buf[20];
+    char buf[21];
     size_t total = 0;
     for (size_t i = 0; i < count; i++) {
         total += utoa_u64((ullong)i, buf);
@@ -79,7 +79,7 @@ static size_t bench_utoa_sml_u64(void *ctx, size_t count)
 
 static size_t bench_utoa_big_u64(void *ctx, size_t count)
 {
-    char buf[20];
+    char buf[21];
     size_t total = 0;
     for (size_t i = 0; i < count; i++) {
         total += utoa_u64((ullong)i << 31, buf);
@@ -89,7 +89,7 @@ static size_t bench_utoa_big_u64(void *ctx, size_t count)
 
 static size_t bench_utoa_rnd_u32(void *ctx, size_t count)
 {
-    char buf[10];
+    char buf[11];
     size_t total = 0;
     for (size_t i = 0; i < count; i++) {
         total += utoa_u32(((uint*)ctx)[i], buf);
@@ -99,7 +99,7 @@ static size_t bench_utoa_rnd_u32(void *ctx, size_t count)
 
 static size_t bench_utoa_rnd_u64(void *ctx, size_t count)
 {
-    char buf[20];
+    char buf[21];
     size_t total = 0;
     for (size_t i = 0; i < count; i++) {
         total += utoa_u64(((ullong*)ctx)[i], buf);
