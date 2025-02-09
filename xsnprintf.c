@@ -29,7 +29,7 @@
 
 static const char *hexdigits = "0123456789abcdef";
 
-static size_t xvappend_char(char * restrict out, size_t o, size_t n, char c)
+static size_t xvappend_char(char *restrict out, size_t o, size_t n, char c)
 {
     if (out && o < n) {
         out[o] = c;
@@ -37,40 +37,41 @@ static size_t xvappend_char(char * restrict out, size_t o, size_t n, char c)
     return o + 1;
 }
 
-static size_t xvappend_hex_u32(char * restrict out, size_t o, size_t n,
+static size_t xvappend_hex_u32(char *restrict out, size_t o, size_t n,
     uint val)
 {
     size_t dig = (32 - __builtin_clz(val) + 3) / 4;
-    for (size_t i = dig-1; i < dig; i--) {
-       o = xvappend_char(out, o, n, hexdigits[(val >> (i * 4)) & 0xf]);
+    for (size_t i = dig - 1; i < dig; i--) {
+        o = xvappend_char(out, o, n, hexdigits[(val >> (i * 4)) & 0xf]);
     }
     return o;
 }
 
-static size_t xvappend_hex_u64(char * restrict out, size_t o, size_t n,
+static size_t xvappend_hex_u64(char *restrict out, size_t o, size_t n,
     ullong val)
 {
     size_t dig = (64 - __builtin_clzll(val) + 3) / 4;
-    for (size_t i = dig-1; i < dig; i--) {
-       o = xvappend_char(out, o, n, hexdigits[(val >> (i * 4)) & 0xf]);
+    for (size_t i = dig - 1; i < dig; i--) {
+        o = xvappend_char(out, o, n, hexdigits[(val >> (i * 4)) & 0xf]);
     }
     return o;
 }
 
-int xvsnprintf(char * restrict out, size_t n, const char* fmt, va_list vl)
+int xvsnprintf(char *restrict out, size_t n, const char* fmt, va_list vl)
 {
     int w = -1, s = 0, c;
     size_t o = 0, l;
     const char *v;
     char t[21];
-    for( ; *fmt; fmt++) {
+    for ( ; *fmt; fmt++) {
         if (w >= 0) {
-            switch(*fmt) {
+            switch (*fmt) {
             case 'l':
                 w = w < 2 ? w + 1 : w;
                 break;
             case 'd':
                 s = 1;
+                /* fallthrough */
             case 'u':
                 if (w == 0 || sizeof(long) == 4) {
                     int val = va_arg(vl, int);
@@ -98,6 +99,7 @@ int xvsnprintf(char * restrict out, size_t n, const char* fmt, va_list vl)
                 o = xvappend_char(out, o, n, '0');
                 o = xvappend_char(out, o, n, 'x');
                 w = 2;
+                /* fallthrough */
             case 'x':
                 if (w == 0 || sizeof(long) == 4) {
                     int val = va_arg(vl, int);
@@ -123,7 +125,7 @@ int xvsnprintf(char * restrict out, size_t n, const char* fmt, va_list vl)
                 break;
             }
         }
-        else if(*fmt == '%') {
+        else if (*fmt == '%') {
             w = 0;
         }
         else {

@@ -73,19 +73,54 @@ static inline size_t utoa_u32(uint n, char *s)
     };
     uint x1, x2, a1, a2, a3, b1, b2;
     uint dig = n == 0 ? 1 : utodb_u32[__builtin_clz(n)];
-    dig += n > utodd_u32[9-dig];
+    dig += n > utodd_u32[9 - dig];
     x1 = n % 1000000; x2 = n / 1000000;
     switch (dig) {
-    case 9:      b2 = x2 / 100 % 100; *s++ = dd[b2*2+1]; goto l8;
-    case 7:      b1 = x2 % 100;       *s++ = dd[b1*2+1]; goto l6;
-    case 5:      a3 = x1 / 10000;     *s++ = dd[a3*2+1]; goto l4;
-    case 3:      a2 = x1 / 100 % 100; *s++ = dd[a2*2+1]; goto l2;
-    case 1:      a1 = x1 % 100;       *s++ = dd[a1*2+1]; break;
-    case 10:     b2 = x2 / 100 % 100; *s++ = dd[b2*2]; *s++ = dd[b2*2+1];
-    case 8:  l8: b1 = x2 % 100;       *s++ = dd[b1*2]; *s++ = dd[b1*2+1];
-    case 6:  l6: a3 = x1 / 10000;     *s++ = dd[a3*2]; *s++ = dd[a3*2+1];
-    case 4:  l4: a2 = x1 / 100 % 100; *s++ = dd[a2*2]; *s++ = dd[a2*2+1];
-    case 2:  l2: a1 = x1 % 100;       *s++ = dd[a1*2]; *s++ = dd[a1*2+1];
+    case 9:
+        b2 = x2 / 100 % 100;
+        *s++ = dd[b2 * 2 + 1];
+        goto l8;
+    case 7:
+        b1 = x2 % 100;
+        *s++ = dd[b1 * 2 + 1];
+        goto l6;
+    case 5:
+        a3 = x1 / 10000;
+        *s++ = dd[a3 * 2 + 1];
+        goto l4;
+    case 3:
+        a2 = x1 / 100 % 100;
+        *s++ = dd[a2 * 2 + 1];
+        goto l2;
+    case 1:
+        a1 = x1 % 100;
+        *s++ = dd[a1 * 2 + 1];
+        break;
+    case 10:
+        b2 = x2 / 100 % 100;
+        *s++ = dd[b2 * 2];
+        *s++ = dd[b2 * 2 + 1];
+        /* fallthrough */
+    case 8:  l8:
+        b1 = x2 % 100;
+        *s++ = dd[b1 * 2];
+        *s++ = dd[b1 * 2 + 1];
+        /* fallthrough */
+    case 6:  l6:
+        a3 = x1 / 10000;
+        *s++ = dd[a3 * 2];
+        *s++ = dd[a3 * 2 + 1];
+        /* fallthrough */
+    case 4:  l4:
+        a2 = x1 / 100 % 100;
+        *s++ = dd[a2 * 2];
+        *s++ = dd[a2 * 2 + 1];
+        /* fallthrough */
+    case 2:  l2:
+        a1 = x1 % 100;
+        *s++ = dd[a1 * 2];
+        *s++ = dd[a1 * 2 + 1];
+        break;
     }
     *s++ = '\0';
     return dig;
@@ -118,31 +153,101 @@ static inline size_t utoa_u64(ullong n, char *s)
     ullong x1, x2;
     uint y1, y2, z1, z2, a1, a2, a3, b1, b2, b3, c1, c2, c3, d1;
     uint dig = n == 0 ? 1 : utodb_u64[__builtin_clzll(n)];
-    dig += n > utodd_u64[19-dig];
+    dig += n > utodd_u64[19 - dig];
     x1 = n  % 1000000000000ll; x2 = n  / 1000000000000ll;
     y1 = x1 % 1000000ll;       y2 = x1 / 1000000ll;
     z1 = x2 % 1000000ll;       z2 = x2 / 1000000ll;
     switch (dig) {
-    case 19:      d1 = z2 % 100;       *s++ = dd[d1*2+1]; goto l18;
-    case 17:      c3 = z1 / 10000;     *s++ = dd[c3*2+1]; goto l16;
-    case 15:      c2 = z1 / 100 % 100; *s++ = dd[c2*2+1]; goto l14;
-    case 13:      c1 = z1 % 100;       *s++ = dd[c1*2+1]; goto l12;
-    case 11:      b3 = y2 / 10000;     *s++ = dd[b3*2+1]; goto l10;
-    case 9:       b2 = y2 / 100 % 100; *s++ = dd[b2*2+1]; goto l8;
-    case 7:       b1 = y2 % 100;       *s++ = dd[b1*2+1]; goto l6;
-    case 5:       a3 = y1 / 10000;     *s++ = dd[a3*2+1]; goto l4;
-    case 3:       a2 = y1 / 100 % 100; *s++ = dd[a2*2+1]; goto l2;
-    case 1:       a1 = y1 % 100;       *s++ = dd[a1*2+1]; break;
-    case 20:      d1 = z2 % 100;       *s++ = dd[d1*2]; *s++ = dd[d1*2+1];
-    case 18: l18: c3 = z1 / 10000;     *s++ = dd[c3*2]; *s++ = dd[c3*2+1];
-    case 16: l16: c2 = z1 / 100 % 100; *s++ = dd[c2*2]; *s++ = dd[c2*2+1];
-    case 14: l14: c1 = z1 % 100;       *s++ = dd[c1*2]; *s++ = dd[c1*2+1];
-    case 12: l12: b3 = y2 / 10000;     *s++ = dd[b3*2]; *s++ = dd[b3*2+1];
-    case 10: l10: b2 = y2 / 100 % 100; *s++ = dd[b2*2]; *s++ = dd[b2*2+1];
-    case 8:  l8:  b1 = y2 % 100;       *s++ = dd[b1*2]; *s++ = dd[b1*2+1];
-    case 6:  l6:  a3 = y1 / 10000;     *s++ = dd[a3*2]; *s++ = dd[a3*2+1];
-    case 4:  l4:  a2 = y1 / 100 % 100; *s++ = dd[a2*2]; *s++ = dd[a2*2+1];
-    case 2:  l2:  a1 = y1 % 100;       *s++ = dd[a1*2]; *s++ = dd[a1*2+1];
+    case 19:
+        d1 = z2 % 100;
+        *s++ = dd[d1 * 2 + 1];
+        goto l18;
+    case 17:
+        c3 = z1 / 10000;
+        *s++ = dd[c3 * 2 + 1];
+        goto l16;
+    case 15:
+        c2 = z1 / 100 % 100;
+        *s++ = dd[c2 * 2 + 1];
+        goto l14;
+    case 13:
+        c1 = z1 % 100;
+        *s++ = dd[c1 * 2 + 1];
+        goto l12;
+    case 11:
+        b3 = y2 / 10000;
+        *s++ = dd[b3 * 2 + 1];
+        goto l10;
+    case 9:
+        b2 = y2 / 100 % 100;
+        *s++ = dd[b2 * 2 + 1];
+        goto l8;
+    case 7:
+        b1 = y2 % 100;
+        *s++ = dd[b1 * 2 + 1];
+        goto l6;
+    case 5:
+        a3 = y1 / 10000;
+        *s++ = dd[a3 * 2 + 1];
+        goto l4;
+    case 3:
+        a2 = y1 / 100 % 100;
+        *s++ = dd[a2 * 2 + 1];
+        goto l2;
+    case 1:
+        a1 = y1 % 100;
+        *s++ = dd[a1 * 2 + 1];
+        break;
+    case 20:
+        d1 = z2 % 100;
+        *s++ = dd[d1 * 2];
+        *s++ = dd[d1 * 2 + 1];
+        /* fallthrough */
+    case 18: l18:
+        c3 = z1 / 10000;
+        *s++ = dd[c3 * 2];
+        *s++ = dd[c3 * 2 + 1];
+        /* fallthrough */
+    case 16: l16:
+        c2 = z1 / 100 % 100;
+        *s++ = dd[c2 * 2];
+        *s++ = dd[c2 * 2 + 1];
+        /* fallthrough */
+    case 14: l14:
+        c1 = z1 % 100;
+        *s++ = dd[c1 * 2];
+        *s++ = dd[c1 * 2 + 1];
+        /* fallthrough */
+    case 12: l12:
+        b3 = y2 / 10000;
+        *s++ = dd[b3 * 2];
+        *s++ = dd[b3 * 2 + 1];
+        /* fallthrough */
+    case 10: l10:
+        b2 = y2 / 100 % 100;
+        *s++ = dd[b2 * 2];
+        *s++ = dd[b2 * 2 + 1];
+        /* fallthrough */
+    case 8:  l8:
+        b1 = y2 % 100;
+        *s++ = dd[b1 * 2];
+        *s++ = dd[b1 * 2 + 1];
+        /* fallthrough */
+    case 6:  l6:
+        a3 = y1 / 10000;
+        *s++ = dd[a3 * 2];
+        *s++ = dd[a3 * 2 + 1];
+        /* fallthrough */
+    case 4:  l4:
+        a2 = y1 / 100 % 100;
+        *s++ = dd[a2 * 2];
+        *s++ = dd[a2 * 2 + 1];
+        /* fallthrough */
+    case 2:  l2:
+        a1 = y1 % 100;
+        *s++ = dd[a1 * 2];
+        *s++ = dd[a1 * 2 + 1];
+        break;
     }
     *s++ = '\0';
     return dig;
