@@ -194,6 +194,42 @@ void test_exec(const char *name, size_t count,
     assert(total == count);
 }
 
+void test_xsnprintf_pad()
+{
+    const void *p = (void*)15;
+    char buf1[64], buf2[64];
+    snprintf(buf1, sizeof(buf1), "x %8d %% %12d %% %12d x %p x",
+        1000000000, 1000000000, -1000000000, p);
+    xsnprintf(buf2, sizeof(buf2), "x %8d %% %12d %% %12d x %p x",
+        1000000000, 1000000000, -1000000000, p);
+    assert(strlen(buf1) == strlen(buf2));
+    assert(memcmp(buf1, buf2, strlen(buf1)) == 0);
+    snprintf(buf1, sizeof(buf1), "x %08d %% %012d %% %012d x %p x",
+        1000000000, 1000000000, -1000000000, p);
+    xsnprintf(buf2, sizeof(buf2), "x %08d %% %012d %% %012d x %p x",
+        1000000000, 1000000000, -1000000000, p);
+    assert(strlen(buf1) == strlen(buf2));
+    assert(memcmp(buf1, buf2, strlen(buf1)) == 0);
+    snprintf(buf1, sizeof(buf1), "x %08d %% %-12d %% %-12d x %p x",
+        1000000000, 1000000000, -1000000000, p);
+    xsnprintf(buf2, sizeof(buf2), "x %08d %% %-12d %% %-12d x %p x",
+        1000000000, 1000000000, -1000000000, p);
+    assert(strlen(buf1) == strlen(buf2));
+    assert(memcmp(buf1, buf2, strlen(buf1)) == 0);
+    snprintf(buf1, sizeof(buf1), "x %8s %% %12s %% %12s x %s x",
+        "1000000000", "1000000000", "-1000000000", "0xf");
+    xsnprintf(buf2, sizeof(buf2), "x %8s %% %12s %% %12s x %s x",
+        "1000000000", "1000000000", "-1000000000", "0xf");
+    assert(strlen(buf1) == strlen(buf2));
+    assert(memcmp(buf1, buf2, strlen(buf1)) == 0);
+    snprintf(buf1, sizeof(buf1), "x %8s %% %-12s %% %-12s x %s x",
+        "1000000000", "1000000000", "-1000000000", "0xf");
+    xsnprintf(buf2, sizeof(buf2), "x %8s %% %-12s %% %-12s x %s x",
+        "1000000000", "1000000000", "-1000000000", "0xf");
+    assert(strlen(buf1) == strlen(buf2));
+    assert(memcmp(buf1, buf2, strlen(buf1)) == 0);
+}
+
 void run_tests()
 {
     test_utoa_u32();
@@ -206,6 +242,7 @@ void run_tests()
                 rnd_setup_u32, rnd_teardown, test_xsnprintf_rnd_u32);
     test_exec("xsnprintf_rnd_u64", 1000000,
                 rnd_setup_u64, rnd_teardown, test_xsnprintf_rnd_u64);
+    test_xsnprintf_pad();
 }
 
 int main(int argc, char **argv)

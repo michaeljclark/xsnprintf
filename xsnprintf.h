@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <stdio.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <string.h>
@@ -288,13 +289,31 @@ static inline size_t xvappend_hex_u64(char *restrict out, size_t o, size_t n,
 static inline int xvsnprintf(char *restrict out, size_t n, const char* fmt,
     va_list vl)
 {
-    int w = -1, s = 0, c;
+    int w = -1, s = 0, d = 0, p = ' ', c;
     size_t o = 0, l;
     const char *v;
     char t[21];
     for ( ; *fmt; fmt++) {
+        c = *fmt;
         if (w >= 0) {
-            switch (*fmt) {
+            switch (c) {
+            case '-':
+                if (d == 0) {
+                    p = '-';
+                }
+                break;
+            case '0':
+                if (d == 0) {
+                    p = '0';
+                }
+                d *= 10;
+                break;
+            case '1': case '2': case '3':
+            case '4': case '5': case '6':
+            case '7': case '8': case '9':
+                d *= 10;
+                d = d + (c - '0');
+                break;
             case 'l':
                 w = w < 2 ? w + 1 : w;
                 break;
@@ -306,7 +325,9 @@ static inline int xvsnprintf(char *restrict out, size_t n, const char* fmt,
                     int val = va_arg(vl, int);
                     if (s && val < 0) {
                         val = -val;
-                        o = xvappend_char(out, o, n, '-');
+                    }
+                    else {
+                        s = 0;
                     }
                     l = utoa_u32(val, t);
                 }
@@ -314,15 +335,33 @@ static inline int xvsnprintf(char *restrict out, size_t n, const char* fmt,
                     llong val = va_arg(vl, llong);
                     if (s && val < 0) {
                         val = -val;
-                        o = xvappend_char(out, o, n, '-');
+                    }
+                    else {
+                        s = 0;
                     }
                     l = utoa_u64(val, t);
                 }
-                l = n - o < l ? n - o : l;
-                memcpy(out + o, t, l);
-                o += l;
+                if (s && p == '0') {
+                    o = xvappend_char(out, o, n, '-');
+                }
+                l = n - o < l + s ? n - o : l + s;
+                if (l < d && p != '-') {
+                    memset(out + o, p, d - l);
+                    o += d - l;
+                }
+                if (s && (p == ' ' || p == '-')) {
+                    o = xvappend_char(out, o, n, '-');
+                }
+                memcpy(out + o, t, l - s);
+                o += l - s;
+                if (l < d && p == '-') {
+                    memset(out + o, ' ', d - l);
+                    o += d - l;
+                }
                 w = -1;
                 s = 0;
+                d = 0;
+                p = ' ';
                 break;
             case 'p':
                 o = xvappend_char(out, o, n, '0');
@@ -343,22 +382,42 @@ static inline int xvsnprintf(char *restrict out, size_t n, const char* fmt,
             case 's':
                 v = va_arg(vl, const char *);
                 l = strlen(v);
-                memcpy(out + o, v, n - o < l ? n - o : l);
+                l = n - o < l ? n - o : l;
+                if (l < d && p != '-') {
+                    memset(out + o, p, d - l);
+                    o += d - l;
+                }
+                memcpy(out + o, v, l);
                 o += l;
+                if (l < d && p == '-') {
+                    memset(out + o, ' ', d - l);
+                    o += d - l;
+                }
                 w = -1;
+                d = 0;
+                p = ' ';
                 break;
             case 'c':
                 c = va_arg(vl, int);
+                /* fallthrough */
+            case '%':
                 o = xvappend_char(out, o, n, (char)c);
                 w = -1;
                 break;
+            default:
+                o = xvappend_char(out, o, n, '%');
+                o = xvappend_char(out, o, n, (char)c);
+                w = -1;
+                d = 0;
+                p = ' ';
+                break;
             }
         }
-        else if (*fmt == '%') {
+        else if (c == '%') {
             w = 0;
         }
         else {
-            o = xvappend_char(out, o, n, *fmt);
+            o = xvappend_char(out, o, n, (char)c);
         }
     }
     if (out) {
