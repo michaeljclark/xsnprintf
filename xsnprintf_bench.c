@@ -275,7 +275,7 @@ void run_benchmarks(size_t loops)
                 NULL, NULL, bench_snprintf_sml_u32);
     bench_exec("snprintf_sml_u32", loops, 100000000,
                 NULL, NULL, bench_snprintf_sml_u32);
-    bench_exec("snprintf_rnd_u64", loops, 100000,
+    bench_exec("snprintf_rnd_u32", loops, 100000,
                 rnd_setup_u32, rnd_teardown, bench_snprintf_rnd_u32);
     bench_exec("snprintf_sml_u64", loops, 100000000,
                 NULL, NULL, bench_snprintf_sml_u64);
